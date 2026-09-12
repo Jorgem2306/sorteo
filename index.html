@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta de Premios</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Logo superior izquierdo -->
+    <img src="logoakuma.png" alt="Logo Akuma" class="top-logo">
+
+    <div class="wheel-wrapper">
+        <!-- Puntero -->
+        <div class="wheel-pointer">
+            <div class="pointer-shape">
+                <div class="pointer-dot"></div>
+            </div>
+        </div>
+
+        <!-- Aro con la ruleta -->
+        <div class="wheel-bezel">
+            <canvas id="wheelCanvas" width="800" height="800"></canvas>
+        </div>
+
+        <!-- Centro dorado (también sirve para girar al hacer clic) -->
+        <div class="wheel-center" id="centerSpin"></div>
+    </div>
+
+    <!-- Ventana emergente de premio -->
+    <div class="modal" id="prizeModal">
+        <div class="modal-content">
+            <h3 class="modal-title">¡FELICIDADES!</h3>
+            <p>Has ganado:</p>
+            <div class="modal-prize" id="prizeText"></div>
+            <button class="modal-close" id="closeModal">Aceptar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
