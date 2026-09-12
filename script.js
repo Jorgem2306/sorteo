@@ -97,6 +97,8 @@ const arcSize = (2 * Math.PI) / totalSegments;
 
 let currentRotation = 0; // Ángulo acumulado en radianes
 let isSpinning = false;
+let isIdleSpinning = true;
+let idleAnimationFrame;
 
 // Dibuja la ruleta en el Canvas
 function drawWheel() {
@@ -159,6 +161,8 @@ function drawWheel() {
 function spinWheel() {
     if (isSpinning) return;
     isSpinning = true;
+    isIdleSpinning = false;
+    cancelAnimationFrame(idleAnimationFrame);
 
     // Activar audio
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -240,10 +244,22 @@ function showPrize(prize) {
 
 closeModal.addEventListener("click", () => {
     prizeModal.classList.remove("active");
+    // Volver a girar lento al cerrar la ventana de premio
+    isIdleSpinning = true;
+    idleAnimate();
 });
 
 centerSpin.addEventListener("click", spinWheel);
 canvas.addEventListener("click", spinWheel);
 
-// Dibujo inicial
-drawWheel();
+// Animación de giro lento mientras está inactiva
+function idleAnimate() {
+    if (!isSpinning && isIdleSpinning) {
+        currentRotation += 0.002; // Velocidad de giro lento (ajustable)
+        drawWheel();
+        idleAnimationFrame = requestAnimationFrame(idleAnimate);
+    }
+}
+
+// Iniciar giro lento inicial
+idleAnimate();
