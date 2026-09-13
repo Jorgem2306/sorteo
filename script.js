@@ -332,6 +332,28 @@ function showPrize(prizeTextContent, onCloseCallback) {
     };
 }
 
+// Función de animación de transición (puertas cerrando y abriendo)
+function playDoorTransition(onMiddle) {
+    const doors = document.getElementById("doorTransition");
+    doors.classList.add("active");
+    // Forzar reflow para asegurar animación
+    void doors.offsetWidth;
+    // Cerrar puertas
+    doors.classList.add("closed");
+    
+    setTimeout(() => {
+        // En el momento en que están cerradas, cambiar ruleta
+        if (onMiddle) onMiddle();
+        
+        // Abrir puertas
+        doors.classList.remove("closed");
+        
+        setTimeout(() => {
+            doors.classList.remove("active");
+        }, 800); // Dar tiempo a que terminen de abrirse
+    }, 1200); // Mantener cerradas por 1.2s mostrando el logo
+}
+
 // Configurar ruleta principal
 mainWheel = new Roulette({
     canvasId: 'mainWheelCanvas',
@@ -340,11 +362,13 @@ mainWheel = new Roulette({
     colors: mainColors,
     onFinish: (prize, index) => {
         if (prize === "Caja Misteriosa") {
-            // Detener giro de la principal, ocultarla y mostrar la misteriosa
-            mainWheel.stopIdle();
-            mainContainer.style.display = 'none';
-            mysteryContainer.style.display = 'flex';
-            mysteryWheel.startIdle();
+            // Animación de puertas antes de cambiar
+            playDoorTransition(() => {
+                mainWheel.stopIdle();
+                mainContainer.style.display = 'none';
+                mysteryContainer.style.display = 'flex';
+                mysteryWheel.startIdle();
+            });
         } else {
             showPrize(prize, () => {
                 mainWheel.startIdle();
@@ -368,7 +392,7 @@ mysteryWheel = new Roulette({
     onFinish: (prize, index) => {
         // Enviar el premio mapeado real
         showPrize(mysteryPrizes[index], () => {
-            // Regresar a la ruleta principal
+            // Regresar a la ruleta principal sin la transición de puertas
             mysteryWheel.stopIdle();
             mysteryContainer.style.display = 'none';
             mainContainer.style.display = 'flex';

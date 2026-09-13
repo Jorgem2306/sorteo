@@ -412,3 +412,74 @@ body::after {
     pointer-events: none;
     animation: fadeInBg 1s ease-in-out;
 }
+
+/* --- Transición de Puertas --- */
+.door-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    pointer-events: none;
+}
+.door-transition.active {
+    display: block;
+}
+.door-left, .door-right {
+    position: absolute;
+    top: 0;
+    width: 50.5vw; /* Ligero solape para evitar líneas transparentes */
+    height: 100vh;
+    transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    overflow: hidden;
+}
+
+.door-left {
+    left: 0;
+    transform: translateX(-100%);
+}
+.door-right {
+    right: 0;
+    transform: translateX(100%);
+}
+
+/* Pseudo-elementos con la misma imagen pero anclados al viewport para continuidad perfecta */
+.door-left::before, .door-right::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    bottom: -20px;
+    width: calc(100vw + 40px); /* Tamaño total de la pantalla + margen para el blur */
+    background: url('fondosorteo.jpeg') no-repeat center center;
+    background-size: 100vw 100vh;
+    filter: blur(12px) brightness(0.7);
+    z-index: -1;
+}
+
+/* Alineación exacta para que coincidan sin importar de dónde vengan */
+.door-left::before {
+    left: -20px;
+}
+.door-right::before {
+    right: -20px;
+}
+.door-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    max-width: 750px; /* Logo mucho más grande según lo solicitado */
+    width: 90vw; /* Asegura que no se desborde en pantallas pequeñas */
+    z-index: 1001;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    opacity: 0;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
+}
+.door-transition.closed .door-left,
+.door-transition.closed .door-right {
+    transform: translateX(0);
+}
+.door-transition.closed .door-logo {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    transition-delay: 0.3s; /* Logo aparece una vez las puertas están cerrando */
+}
