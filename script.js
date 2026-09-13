@@ -73,7 +73,7 @@ function drawFeatheredImage(ctx, img, x, y, size) {
         tempCtx.globalCompositeOperation = 'destination-out';
         tempCtx.fillStyle = grad;
         tempCtx.fillRect(0, 0, size, size);
-        
+
         img.featheredCanvas = tempCanvas;
     }
 
@@ -121,8 +121,8 @@ class Roulette {
             this.ctx.moveTo(center, center);
             this.ctx.arc(center, center, radius, angle, angle + this.arcSize);
             this.ctx.lineTo(center, center);
-            
-            
+
+
             this.ctx.restore();
 
             // Dibujar fondo y borde del gajo
@@ -133,7 +133,7 @@ class Roulette {
             this.ctx.arc(center, center, radius, angle, angle + this.arcSize);
             this.ctx.lineTo(center, center);
             this.ctx.fill(); // IMPORTANTE: Pintar el color del gajo
-            
+
             this.ctx.lineWidth = 2;
             this.ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
             this.ctx.stroke();
@@ -147,26 +147,26 @@ class Roulette {
                 else if (color === "#ff4d85") img = imgPink;
                 else if (color === "#ffde59") img = imgYellow;
                 else img = imgBlue;
-                
+
                 if (img && img.complete) {
                     this.ctx.save();
                     this.ctx.translate(center, center);
                     this.ctx.rotate(angle + this.arcSize / 2); // Rotar hacia el centro del gajo
                     this.ctx.translate(radius * 0.62, 0); // Ajustar posición más hacia el borde (arriba)
                     this.ctx.rotate(Math.PI / 2); // Enderezar la imagen
-                    
+
                     const badgeRadius = 165; // Aumentar tamaño de los regalos
-                    
+
                     // Sombra suave para que el objeto parezca flotar sobre el gajo
                     this.ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
                     this.ctx.shadowBlur = 15;
                     this.ctx.shadowOffsetY = 5;
-                    
+
                     // Dibujar la imagen con bordes completamente difuminados
                     drawFeatheredImage(this.ctx, img, -badgeRadius, -badgeRadius, badgeRadius * 2);
-                    
+
                     this.ctx.shadowColor = "transparent"; // Quitar sombra para el resto
-                    
+
                     // IMPORTANTE: Restaurar el contexto para no romper el canvas!
                     this.ctx.restore();
                 }
@@ -286,10 +286,31 @@ const closeModal = document.getElementById("closeModal");
 
 // Listas de premios
 const mainItems = [
-
+    "Te regalo un mes spotify",
+    "Te regalo un mes Netflix",
+    "Te regalo un mes Disney",
+    "Te regalo un pase de batalla fortnite",
+    "Te regalo un gift cards xbox (10€)",
+    "Te regalo un gift cards play (10€)",
+    "Te regalo un gift cards steam (10€)",
+    "Te regalo un mes Xbox",
+    "Te regalo un mes play",
+    "Te regalo un mes game pass pc",
     "Caja Misteriosa",
+    "Te regalo una sub en el canal",
+    "Te regalo un baile de 500pv Fortnite",
+    "Vbucks 10€",
+    "Robux (300)",
+    "Robux (1000)",
+    "Suerte la próxima vez",
+    "Te regalo un gift cards Amazon 5€",
+    "Te regalo un gift cards Amazon 15€",
+    "Te regalo nitro Discord de 1 mes",
+    "Te regalo un gift card de Apple",
+    "Te regalo un gift card de Play Store",
+    "Shark GTAV",
+    "Jackpot $$$",
     "Paypal 10$"
-
 ];
 
 const mainColors = [
@@ -340,14 +361,14 @@ function playDoorTransition(onMiddle) {
     void doors.offsetWidth;
     // Cerrar puertas
     doors.classList.add("closed");
-    
+
     setTimeout(() => {
         // En el momento en que están cerradas, cambiar ruleta
         if (onMiddle) onMiddle();
-        
+
         // Abrir puertas
         doors.classList.remove("closed");
-        
+
         setTimeout(() => {
             doors.classList.remove("active");
         }, 800); // Dar tiempo a que terminen de abrirse
