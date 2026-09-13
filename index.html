@@ -12,21 +12,37 @@
     <!-- Logo superior izquierdo -->
     <img src="logoakuma.png" alt="Logo Akuma" class="top-logo">
 
-    <div class="wheel-wrapper">
-        <!-- Puntero -->
-        <div class="wheel-pointer">
-            <div class="pointer-shape">
-                <div class="pointer-dot"></div>
+    <!-- Ruleta Principal -->
+    <div id="mainWheelContainer" class="wheel-container">
+        <div class="wheel-wrapper">
+            <div class="wheel-pointer">
+                <div class="pointer-shape"><div class="pointer-dot"></div></div>
             </div>
+            <div class="wheel-bezel">
+                <canvas id="mainWheelCanvas" class="wheel-canvas" width="800" height="800"></canvas>
+            </div>
+            <div class="wheel-center" id="mainCenterSpin"></div>
         </div>
+    </div>
 
-        <!-- Aro con la ruleta -->
-        <div class="wheel-bezel">
-            <canvas id="wheelCanvas" width="800" height="800"></canvas>
+    <!-- Ruleta Caja Misteriosa -->
+    <div id="mysteryWheelContainer" class="wheel-container mystery-theme" style="display: none;">
+        <div class="wheel-wrapper">
+            <!-- Personajes a los lados -->
+            <img src="akumapersona.png" class="character-akuma" alt="Akuma">
+            <img src="karolgpersona.png" class="character-karolg" alt="Karol G">
+
+            <div class="mystery-pointer">♥</div>
+            <div class="wheel-bezel mystery-bezel">
+                <!-- Luces de neon alrededor -->
+                <div class="neon-lights"></div>
+                <canvas id="mysteryWheelCanvas" class="wheel-canvas" width="800" height="800"></canvas>
+            </div>
+            <div class="wheel-center mystery-center" id="mysteryCenterSpin"></div>
+            
+            <!-- Base de la ruleta -->
+            <img src="baseruleta.png" class="mystery-base-img" alt="Base Akuma_x10">
         </div>
-
-        <!-- Centro dorado (también sirve para girar al hacer clic) -->
-        <div class="wheel-center" id="centerSpin"></div>
     </div>
 
     <!-- Ventana emergente de premio -->

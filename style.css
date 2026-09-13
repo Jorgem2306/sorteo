@@ -67,7 +67,16 @@ body::after {
     50% { transform: translateY(-8px); }
 }
 
-/* Contenedor principal animado al inicio */
+/* Contenedor para alternar ruletas */
+.wheel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    animation: zoomIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Envoltura interna principal */
 .wheel-wrapper {
     position: relative;
     width: 580px;
@@ -76,7 +85,6 @@ body::after {
     align-items: center;
     justify-content: center;
     z-index: 2;
-    animation: zoomIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes zoomIn {
@@ -139,7 +147,7 @@ body::after {
 }
 
 /* Canvas donde se dibuja la ruleta dinámica */
-#wheelCanvas {
+.wheel-canvas {
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -150,7 +158,7 @@ body::after {
     transition: transform 0.2s;
 }
 
-#wheelCanvas:hover {
+.wheel-canvas:hover {
     transform: scale(1.02);
 }
 
@@ -186,6 +194,34 @@ body::after {
     0% { transform: translate(-50%, -50%) scale(1); }
     50% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 4px 15px rgba(255, 234, 167, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.7); }
     100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* --- Estilos para los personajes de la ruleta misteriosa --- */
+.character-akuma {
+    position: absolute;
+    left: -370px; /* Un poco más a la izquierda, según lo solicitado */
+    bottom: -40px; /* Ajustado ligeramente al hacerlos más pequeños */
+    height: 470px; /* Un poco más pequeños */
+    z-index: 10; /* ¡Por delante de la ruleta! */
+    pointer-events: none; /* Para que no interfiera con los clics */
+    filter: drop-shadow(5px 10px 15px rgba(0, 0, 0, 0.7));
+    animation: floatCharacter 4s ease-in-out infinite;
+}
+
+.character-karolg {
+    position: absolute;
+    right: -330px; /* Aún más separados de la ruleta */
+    bottom: -40px;
+    height: 470px; /* Un poco más pequeños */
+    z-index: 10; /* ¡Por delante de la ruleta! */
+    pointer-events: none;
+    filter: drop-shadow(-5px 10px 15px rgba(0, 0, 0, 0.7));
+    animation: floatCharacter 4s ease-in-out infinite 2s; /* Animación desfasada */
+}
+
+@keyframes floatCharacter {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
 }
 
 /* Modal / Pop-up de felicitación */
@@ -285,4 +321,94 @@ body::after {
 .modal-close:hover {
     transform: scale(1.05);
     background: #fff4cc;
+}
+
+/* =========================================
+   DISEÑO NEÓN "CAJA MISTERIOSA"
+========================================= */
+
+/* Fondo específico para aislar la ruleta misteriosa */
+.mystery-theme {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: url('fondosorteo.jpeg') no-repeat center center;
+    background-size: cover;
+    z-index: 50; 
+    animation: fadeInBg 1s ease-in-out;
+}
+
+/* Subir toda la estructura y hacerla más pequeña (scale) para centrarla visualmente y evitar cortes */
+.mystery-theme .wheel-wrapper {
+    transform: translateY(-40px) scale(0.85);
+}
+
+@keyframes fadeInBg { from { opacity: 0; } to { opacity: 1; } }
+
+/* Aro exterior negro con brillo rosa */
+.mystery-theme .mystery-bezel {
+    background: #0f0a1d;
+    border: 8px solid #ff007f;
+    box-shadow: 0 0 30px #ff007f, inset 0 0 30px #ff007f, 0 20px 40px rgba(0,0,0,0.8);
+    padding: 15px;
+}
+
+/* Luces de neón en el borde (simuladas con dots o borde dashed) */
+.mystery-theme .neon-lights {
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 5px dotted #ffb3d9;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* Centro negro con borde neón y texto "GIRA" */
+.mystery-theme .mystery-center {
+    background: #0a0616;
+    border: 4px solid #ff007f;
+    box-shadow: 0 0 20px #ff007f, inset 0 0 10px #ff007f;
+    color: #ff99cc;
+    text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
+    font-size: 15px;
+    line-height: 1.2;
+    width: 80px; height: 80px;
+    animation: neonPulse 1.5s infinite alternate;
+}
+@keyframes neonPulse {
+    from { box-shadow: 0 0 15px #ff007f, inset 0 0 10px #ff007f; text-shadow: 0 0 10px #ff007f; transform: translate(-50%, -50%) scale(1); }
+    to { box-shadow: 0 0 35px #ff007f, inset 0 0 20px #ff007f; text-shadow: 0 0 20px #ff007f, 0 0 30px #ff007f; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* Puntero negro con borde rosa */
+.mystery-theme .mystery-pointer {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px; height: 60px;
+    background: #0a0616;
+    border-top: 4px solid #ff007f;
+    box-shadow: 0 -10px 20px rgba(255,0,127,0.5);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    z-index: 10;
+    color: #ff99cc;
+    display: flex;
+    justify-content: center;
+    padding-top: 5px;
+    font-size: 22px;
+    text-shadow: 0 0 10px #ff007f;
+    animation: bouncePointer 2.5s infinite ease-in-out;
+}
+
+/* Base de la ruleta tipo pedestal (Imagen) */
+.mystery-theme .mystery-base-img {
+    position: absolute;
+    top: 96%; /* Para que empiece justo en el borde inferior de la ruleta */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 550px; /* Un poco más ancha para que sirva de base sólida */
+    z-index: 1; /* Al frente para que no se oculte el borde superior de la base */
+    pointer-events: none;
+    animation: fadeInBg 1s ease-in-out;
 }

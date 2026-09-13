@@ -1,49 +1,3 @@
-// Lista exacta de items proporcionados
-const items = [
-    "1 mes spoty",
-    "1 mes Netflix",
-    "1 mes Disney",
-    "pase de batalla fortnite",
-    "gift cards xbox (10€)",
-    "gift cards play (10€)",
-    "gift cards steam (10€)",
-    "1 mes Xbox",
-    "1 mes play",
-    "1 mes game pass pc",
-    "1 sub en el canal",
-    "Baile de 500pv Fortnite",
-    "Vbucks 10€",
-    "Robux (300)",
-    "Robux (1000)",
-    "Suerte la próxima vez",
-    "gift cards Amazon 5€",
-    "gift cards Amazon 15€",
-    "Nitro Discord 1 mes",
-    "Gift card de Apple",
-    "Gift card de Play Store",
-    "Shark GTAV",
-    "Caja Misteriosa",
-    "Paypal 10$",
-    "Jackpot $$$"
-];
-
-// Paleta de colores inspirada en la imagen
-const sliceColors = [
-    "#00a8e8", // Cyan / Azul eléctrico
-    "#e60067", // Fucsia brillante
-    "#ff7a00", // Naranja cálido
-    "#7b1fa2", // Violeta / Morado
-    "#1a1a1a", // Negro grafito
-    "#e50914"  // Rojo intenso
-];
-
-const canvas = document.getElementById("wheelCanvas");
-const ctx = canvas.getContext("2d");
-const centerSpin = document.getElementById("centerSpin");
-const prizeModal = document.getElementById("prizeModal");
-const prizeText = document.getElementById("prizeText");
-const closeModal = document.getElementById("closeModal");
-
 // --- API DE AUDIO WEB PARA SINTETIZAR LOS SONIDOS ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -53,15 +7,14 @@ function playTick() {
     const gainNode = audioCtx.createGain();
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    
-    // Sonido tipo "click" corto
+
     oscillator.type = 'sine';
     oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
     oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-    
+
     gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-    
+
     oscillator.start(audioCtx.currentTime);
     oscillator.stop(audioCtx.currentTime + 0.05);
 }
@@ -72,166 +25,298 @@ function playWinSound() {
     const gainNode = audioCtx.createGain();
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    
-    // Arpegio de victoria
+
     oscillator.type = 'triangle';
     const now = audioCtx.currentTime;
-    
+
     oscillator.frequency.setValueAtTime(440, now); // A4
     oscillator.frequency.setValueAtTime(554.37, now + 0.1); // C#5
     oscillator.frequency.setValueAtTime(659.25, now + 0.2); // E5
     oscillator.frequency.setValueAtTime(880, now + 0.3); // A5
-    
+
     gainNode.gain.setValueAtTime(0, now);
     gainNode.gain.linearRampToValueAtTime(0.3, now + 0.1);
     gainNode.gain.setValueAtTime(0.3, now + 0.4);
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-    
+
     oscillator.start(now);
     oscillator.stop(now + 1.5);
 }
 // ----------------------------------------------------
 
-const totalSegments = items.length;
-const arcSize = (2 * Math.PI) / totalSegments;
+// Precargar imágenes generadas de regalos
+const imgPink = new Image(); imgPink.src = 'gift_pink.jpg';
+const imgPurple = new Image(); imgPurple.src = 'gift_purple.jpg';
+const imgCyan = new Image(); imgCyan.src = 'gift_cyan.jpg';
+const imgYellow = new Image(); imgYellow.src = 'gift_yellow.jpg';
+const imgBlue = new Image(); imgBlue.src = 'gift_blue.jpg';
 
-let currentRotation = 0; // Ángulo acumulado en radianes
-let isSpinning = false;
-let isIdleSpinning = true;
-let idleAnimationFrame;
+// Función para difuminar bordes de la imagen (con caché para mejor rendimiento)
+function drawFeatheredImage(ctx, img, x, y, size) {
+    if (!img.featheredCanvas) {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = size;
+        tempCanvas.height = size;
+        const tempCtx = tempCanvas.getContext('2d');
 
-// Dibuja la ruleta en el Canvas
-function drawWheel() {
-    const width = canvas.width;
-    const height = canvas.height;
-    const center = width / 2;
-    const radius = center - 10;
+        // Dibujar la imagen completa
+        tempCtx.drawImage(img, 0, 0, size, size);
 
-    ctx.clearRect(0, 0, width, height);
+        // Crear gradiente para borrar los bordes suavemente
+        const cx = size / 2;
+        const cy = size / 2;
+        // Comienza a difuminar desde el 60% del radio hasta el borde
+        const grad = tempCtx.createRadialGradient(cx, cy, size * 0.35, cx, cy, size * 0.5);
+        grad.addColorStop(0, 'rgba(0,0,0,0)'); // Mantener intacto el centro
+        grad.addColorStop(1, 'rgba(0,0,0,1)'); // Borrar completamente el borde
 
-    items.forEach((item, index) => {
-        const angle = currentRotation + index * arcSize;
-        const color = sliceColors[index % sliceColors.length];
-
-        // Dibujar gajo
-        ctx.save();
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, radius, angle, angle + arcSize);
-        ctx.lineTo(center, center);
-        ctx.fill();
-
-        // Borde fino blanco/dorado entre gajos
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
-        ctx.stroke();
-        ctx.restore();
-
-        // Dibujar texto dentro del segmento
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(angle + arcSize / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 19px Arial";
-        ctx.shadowColor = "rgba(0,0,0,0.85)";
-        ctx.shadowBlur = 4;
-
-        // Limitar tamaño del texto si es muy largo
-        let text = item.toUpperCase();
-        if (text.length > 22) {
-            text = text.substring(0, 20) + "..";
-        }
-
-        // Posicionar el texto cerca del borde exterior
-        ctx.fillText(text, radius - 25, 6);
-
-        // Pequeño círculo decorativo en el borde exterior del gajo
-        ctx.beginPath();
-        ctx.arc(radius - 12, 0, 3, 0, 2 * Math.PI);
-        ctx.fillStyle = "#ffde59";
-        ctx.fill();
-
-        ctx.restore();
-    });
-}
-
-// Función de animación con curva de desaceleración (Ease-out Cubic)
-function spinWheel() {
-    if (isSpinning) return;
-    isSpinning = true;
-    isIdleSpinning = false;
-    cancelAnimationFrame(idleAnimationFrame);
-
-    // Activar audio
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-    // Elegir premio aleatorio
-    const winningIndex = Math.floor(Math.random() * totalSegments);
-
-    /*
-      Cálculo del ángulo final:
-      El puntero se encuentra en la parte superior (270° o 3*PI/2 rad).
-      Queremos que el centro del segmento ganador quede exactamente debajo del puntero.
-    */
-    const pointerAngle = 3 * Math.PI / 2;
-    const targetAngleCenter = winningIndex * arcSize + (arcSize / 2);
-
-    // Mínimo 5 a 8 vueltas completas para que dure unos 5 segundos
-    const extraRounds = Math.floor(Math.random() * 3 + 6) * (2 * Math.PI);
-
-    // Calculamos cuánto rotar partiendo de la posición actual
-    const normalizedCurrent = currentRotation % (2 * Math.PI);
-    let targetRotation = (pointerAngle - targetAngleCenter) - normalizedCurrent;
-
-    while (targetRotation < 0) {
-        targetRotation += 2 * Math.PI;
-    }
-
-    const startRotation = currentRotation;
-    const totalDistance = extraRounds + targetRotation;
-    const duration = 5000; // 5 segundos
-    let startTime = null;
-    let lastTick = Math.floor(currentRotation / arcSize);
-
-    function easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-    }
-
-    function animate(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        currentRotation = startRotation + totalDistance * easeOutCubic(progress);
+        tempCtx.globalCompositeOperation = 'destination-out';
+        tempCtx.fillStyle = grad;
+        tempCtx.fillRect(0, 0, size, size);
         
-        // Detectar si el puntero pasó de un segmento a otro para hacer el sonido
-        const currentTick = Math.floor(currentRotation / arcSize);
-        if (currentTick > lastTick) {
-            playTick();
-            lastTick = currentTick;
-        }
-
-        drawWheel();
-
-        if (progress < 1) {
-            requestAnimationFrame(animate);
-        } else {
-            isSpinning = false;
-            playWinSound(); // Sonido de victoria
-            showPrize(items[winningIndex]);
-        }
+        img.featheredCanvas = tempCanvas;
     }
 
-    requestAnimationFrame(animate);
+    // Dibujar la imagen procesada en el canvas principal
+    ctx.drawImage(img.featheredCanvas, x, y, size, size);
 }
 
-function showPrize(prize) {
-    prizeText.textContent = prize;
+class Roulette {
+    constructor(config) {
+        this.canvas = document.getElementById(config.canvasId);
+        this.ctx = this.canvas.getContext("2d");
+        this.centerSpin = document.getElementById(config.centerId);
+
+        this.items = config.items;
+        this.colors = config.colors;
+        this.onFinish = config.onFinish;
+
+        this.totalSegments = this.items.length;
+        this.arcSize = (2 * Math.PI) / this.totalSegments;
+
+        this.currentRotation = 0;
+        this.isSpinning = false;
+        this.isIdleSpinning = false;
+        this.idleAnimationFrame = null;
+
+        this.initEvents();
+        this.drawWheel();
+    }
+
+    drawWheel() {
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const center = width / 2;
+        const radius = center - 10;
+
+        this.ctx.clearRect(0, 0, width, height);
+
+        this.items.forEach((item, index) => {
+            const angle = this.currentRotation + index * this.arcSize;
+            const color = this.colors[index % this.colors.length];
+
+            // Dibujar gajo
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.moveTo(center, center);
+            this.ctx.arc(center, center, radius, angle, angle + this.arcSize);
+            this.ctx.lineTo(center, center);
+            
+            
+            this.ctx.restore();
+
+            // Dibujar fondo y borde del gajo
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.fillStyle = color;
+            this.ctx.moveTo(center, center);
+            this.ctx.arc(center, center, radius, angle, angle + this.arcSize);
+            this.ctx.lineTo(center, center);
+            this.ctx.fill(); // IMPORTANTE: Pintar el color del gajo
+            
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+            this.ctx.stroke();
+            this.ctx.restore();
+
+            // Volver a dibujar los iconos por encima del fondo
+            if (item === "CAJA MISTERIOSA") {
+                let img;
+                if (color === "#00e5ff") img = imgCyan;
+                else if (color === "#7b1fa2") img = imgPurple;
+                else if (color === "#ff4d85") img = imgPink;
+                else if (color === "#ffde59") img = imgYellow;
+                else img = imgBlue;
+                
+                if (img && img.complete) {
+                    this.ctx.save();
+                    this.ctx.translate(center, center);
+                    this.ctx.rotate(angle + this.arcSize / 2); // Rotar hacia el centro del gajo
+                    this.ctx.translate(radius * 0.62, 0); // Ajustar posición más hacia el borde (arriba)
+                    this.ctx.rotate(Math.PI / 2); // Enderezar la imagen
+                    
+                    const badgeRadius = 165; // Aumentar tamaño de los regalos
+                    
+                    // Sombra suave para que el objeto parezca flotar sobre el gajo
+                    this.ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+                    this.ctx.shadowBlur = 15;
+                    this.ctx.shadowOffsetY = 5;
+                    
+                    // Dibujar la imagen con bordes completamente difuminados
+                    drawFeatheredImage(this.ctx, img, -badgeRadius, -badgeRadius, badgeRadius * 2);
+                    
+                    this.ctx.shadowColor = "transparent"; // Quitar sombra para el resto
+                    
+                    // IMPORTANTE: Restaurar el contexto para no romper el canvas!
+                    this.ctx.restore();
+                }
+            }
+
+            // Texto
+            this.ctx.save();
+            this.ctx.translate(center, center);
+            this.ctx.rotate(angle + this.arcSize / 2);
+
+            this.ctx.textAlign = "right";
+            this.ctx.fillStyle = "#ffffff";
+            this.ctx.font = "bold 19px Arial";
+            this.ctx.shadowColor = "rgba(0,0,0,0.85)";
+            this.ctx.shadowBlur = 4;
+
+            if (item !== "CAJA MISTERIOSA") {
+                let text = item.toUpperCase();
+                if (text.length > 22) {
+                    text = text.substring(0, 20) + "..";
+                }
+                this.ctx.fillText(text, radius - 15, 6);
+            }
+
+            // Círculo decorativo exterior
+            this.ctx.beginPath();
+            this.ctx.arc(radius - 12, 0, 3, 0, 2 * Math.PI);
+            this.ctx.fillStyle = "#ffde59";
+            this.ctx.fill();
+
+            this.ctx.restore();
+        });
+    }
+
+    spin() {
+        if (this.isSpinning) return;
+        this.isSpinning = true;
+        this.isIdleSpinning = false;
+        cancelAnimationFrame(this.idleAnimationFrame);
+
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const winningIndex = Math.floor(Math.random() * this.totalSegments);
+        const pointerAngle = 3 * Math.PI / 2;
+        const targetAngleCenter = winningIndex * this.arcSize + (this.arcSize / 2);
+
+        const extraRounds = Math.floor(Math.random() * 3 + 6) * (2 * Math.PI);
+        const normalizedCurrent = this.currentRotation % (2 * Math.PI);
+
+        let targetRotation = (pointerAngle - targetAngleCenter) - normalizedCurrent;
+        while (targetRotation < 0) {
+            targetRotation += 2 * Math.PI;
+        }
+
+        const startRotation = this.currentRotation;
+        const totalDistance = extraRounds + targetRotation;
+        const duration = 5000;
+        let startTime = null;
+        let lastTick = Math.floor(this.currentRotation / this.arcSize);
+
+        const animate = (currentTime) => {
+            if (!startTime) startTime = currentTime;
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+            this.currentRotation = startRotation + totalDistance * easeOutCubic(progress);
+
+            const currentTick = Math.floor(this.currentRotation / this.arcSize);
+            if (currentTick > lastTick) {
+                playTick();
+                lastTick = currentTick;
+            }
+
+            this.drawWheel();
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                this.isSpinning = false;
+                if (this.onFinish) this.onFinish(this.items[winningIndex], winningIndex);
+            }
+        };
+
+        requestAnimationFrame(animate);
+    }
+
+    startIdle() {
+        this.isIdleSpinning = true;
+        const idleAnimate = () => {
+            if (!this.isSpinning && this.isIdleSpinning) {
+                this.currentRotation += 0.002;
+                this.drawWheel();
+                this.idleAnimationFrame = requestAnimationFrame(idleAnimate);
+            }
+        };
+        idleAnimate();
+    }
+
+    stopIdle() {
+        this.isIdleSpinning = false;
+        cancelAnimationFrame(this.idleAnimationFrame);
+    }
+
+    initEvents() {
+        this.centerSpin.addEventListener("click", () => this.spin());
+        this.canvas.addEventListener("click", () => this.spin());
+    }
+}
+
+// Variables globales UI
+const mainContainer = document.getElementById("mainWheelContainer");
+const mysteryContainer = document.getElementById("mysteryWheelContainer");
+const prizeModal = document.getElementById("prizeModal");
+const prizeText = document.getElementById("prizeText");
+const closeModal = document.getElementById("closeModal");
+
+// Listas de premios
+const mainItems = [
+
+    "Caja Misteriosa",
+    "Paypal 10$"
+
+];
+
+const mainColors = [
+    "#00a8e8", "#e60067", "#ff7a00", "#7b1fa2", "#1a1a1a", "#e50914"
+];
+
+// Colores de la caja misteriosa (Cyan, Morado, Rosa, Amarillo, Azul)
+const mysteryColors = [
+    "#00e5ff", "#7b1fa2", "#ff4d85", "#ffde59", "#00a8e8"
+];
+
+const mysteryPrizes = [
+    "Robux (300) y 1 mes Netflix",             // 0: Verde
+    "Baile fortnite 500pv y 1 mes Spotify",    // 1: Morado
+    "1 sub y nitro Discord 1 mes",             // 2: Rosa
+    "1 sub y pase de batalla fortnite",        // 3: Amarillo
+    "Baile fortnite 500pv y 1 mes Xbox o play" // 4: Celeste
+];
+
+// Instancias de ruletas
+let mainWheel, mysteryWheel;
+
+function showPrize(prizeTextContent, onCloseCallback) {
+    prizeText.textContent = prizeTextContent;
     prizeModal.classList.add("active");
-    
-    // Lanzar confeti al ganar
+    playWinSound();
+
     if (typeof confetti === 'function') {
         confetti({
             particleCount: 150,
@@ -240,26 +325,57 @@ function showPrize(prize) {
             colors: ['#ffde59', '#e60067', '#00a8e8', '#ffffff']
         });
     }
+
+    closeModal.onclick = () => {
+        prizeModal.classList.remove("active");
+        if (onCloseCallback) onCloseCallback();
+    };
 }
 
-closeModal.addEventListener("click", () => {
-    prizeModal.classList.remove("active");
-    // Volver a girar lento al cerrar la ventana de premio
-    isIdleSpinning = true;
-    idleAnimate();
+// Configurar ruleta principal
+mainWheel = new Roulette({
+    canvasId: 'mainWheelCanvas',
+    centerId: 'mainCenterSpin',
+    items: mainItems,
+    colors: mainColors,
+    onFinish: (prize, index) => {
+        if (prize === "Caja Misteriosa") {
+            // Detener giro de la principal, ocultarla y mostrar la misteriosa
+            mainWheel.stopIdle();
+            mainContainer.style.display = 'none';
+            mysteryContainer.style.display = 'flex';
+            mysteryWheel.startIdle();
+        } else {
+            showPrize(prize, () => {
+                mainWheel.startIdle();
+            });
+        }
+    }
 });
 
-centerSpin.addEventListener("click", spinWheel);
-canvas.addEventListener("click", spinWheel);
-
-// Animación de giro lento mientras está inactiva
-function idleAnimate() {
-    if (!isSpinning && isIdleSpinning) {
-        currentRotation += 0.002; // Velocidad de giro lento (ajustable)
-        drawWheel();
-        idleAnimationFrame = requestAnimationFrame(idleAnimate);
+// Configurar ruleta misteriosa
+mysteryWheel = new Roulette({
+    canvasId: 'mysteryWheelCanvas',
+    centerId: 'mysteryCenterSpin',
+    items: [
+        "CAJA MISTERIOSA",
+        "CAJA MISTERIOSA",
+        "CAJA MISTERIOSA",
+        "CAJA MISTERIOSA",
+        "CAJA MISTERIOSA"
+    ],
+    colors: mysteryColors,
+    onFinish: (prize, index) => {
+        // Enviar el premio mapeado real
+        showPrize(mysteryPrizes[index], () => {
+            // Regresar a la ruleta principal
+            mysteryWheel.stopIdle();
+            mysteryContainer.style.display = 'none';
+            mainContainer.style.display = 'flex';
+            mainWheel.startIdle();
+        });
     }
-}
+});
 
-// Iniciar giro lento inicial
-idleAnimate();
+// Iniciar animación de la ruleta principal al cargar
+mainWheel.startIdle();
