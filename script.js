@@ -286,6 +286,18 @@ const closeModal = document.getElementById("closeModal");
 
 // Listas de premios
 const mainItems = [
+    "Vbucks 10€",
+    "Robux (300)",
+    "Robux (1000)",
+    "Suerte la próxima vez",
+    "Caja Misteriosa",
+    "Te regalo un gift cards Amazon 5€",
+    "Te regalo un gift cards Amazon 15€",
+    "Te regalo nitro Discord de 1 mes",
+    "Te regalo un gift card de Apple",
+    "Te regalo un gift card de Play Store",
+    "Jackpot $$$",
+    "Paypal 10$",
     "Te regalo un mes spotify",
     "Te regalo un mes Netflix",
     "Te regalo un mes Disney",
@@ -293,24 +305,13 @@ const mainItems = [
     "Te regalo un gift cards xbox (10€)",
     "Te regalo un gift cards play (10€)",
     "Te regalo un gift cards steam (10€)",
+    "Caja Misteriosa",
     "Te regalo un mes Xbox",
     "Te regalo un mes play",
     "Te regalo un mes game pass pc",
-    "Caja Misteriosa",
     "Te regalo una sub en el canal",
     "Te regalo un baile de 500pv Fortnite",
-    "Vbucks 10€",
-    "Robux (300)",
-    "Robux (1000)",
-    "Suerte la próxima vez",
-    "Te regalo un gift cards Amazon 5€",
-    "Te regalo un gift cards Amazon 15€",
-    "Te regalo nitro Discord de 1 mes",
-    "Te regalo un gift card de Apple",
-    "Te regalo un gift card de Play Store",
-    "Shark GTAV",
-    "Jackpot $$$",
-    "Paypal 10$"
+    "Vbucks 10€"
 ];
 
 const mainColors = [
